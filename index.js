@@ -16,6 +16,12 @@ app.get("/", async (req, res) => {
    res.send("Task Management API is running");
 });
 
+const client = new MongoClient(uri, {
+   useNewUrlParser: true,
+   useUnifiedTopology: true,
+   serverApi: ServerApiVersion.v1,
+});
+
 app.listen(port, () => {
    console.log("Task Management server is running on port", port);
 });
