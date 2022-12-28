@@ -8,3 +8,10 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", async (req, res) => {
+   res.send("Task Management API is running");
+});
+
+app.listen(port, () => {
+   console.log("Task Management server is running on port", port);
+});
