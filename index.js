@@ -58,7 +58,8 @@ const run = async () => {
          const updatedDoc = {
             $set: {
                title: task.title,
-               description: task.description
+               description: task.description,
+               img: task.img
             },
          };
          const result = await tasksCollection.updateOne(
@@ -77,7 +78,40 @@ const run = async () => {
       });
 
 
-   
+      // Completed tasks API
+      app.get("/completed-tasks", async (req, res) => {
+         const query = {};
+         const completedTasks = await completedTasksCollection.find(query).toArray();
+         res.send(completedTasks);
+      });
+
+
+      app.post("/completed-tasks", async (req, res) => {
+         const completedTask = req.body;
+         const query = {
+            title: completedTask.title,
+            img: completedTask.img
+         };
+
+         const alreadyCompleted = await completedTasksCollection.find(query).toArray();
+
+         if (alreadyCompleted.length) {
+            const message = `${completedTask.title} is already mark as Completed`;
+            return res.send({ acknowledged: false, message });
+         }
+
+         const result = await completedTasksCollection.insertOne(completedTask);
+         res.send(result);
+      });
+
+
+      app.delete("/completed-tasks/:id", async (req, res) => {
+         const id = req.params.id;
+         const filter = { _id: ObjectId(id) };
+         const result = await completedTasksCollection.deleteOne(filter);
+         res.send(result);
+      });
+
    } finally {
    }
 };
