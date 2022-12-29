@@ -26,14 +26,58 @@ const run = async () => {
    try {
       // Database Collections
       const tasksCollection = client.db("taskManagement").collection("tasks");
+      const completedTasksCollection = client.db("taskManagement").collection("completedTasks");
 
-      // Tasks API
+      // My Tasks API
       app.get("/tasks", async (req, res) => {
          const query = {};
          const tasks = await tasksCollection.find(query).toArray();
          res.send(tasks);
       });
 
+      app.get("/task/:id", async (req, res) => {
+         const id = req.params.id;
+         const query = { _id: ObjectId(id) };
+         const task = await tasksCollection.findOne(query);
+         res.send(task);
+      });
+
+      app.post("/tasks", async (req, res) => {
+         const task = req.body;
+         const result = await tasksCollection.insertOne(task);
+         res.send(result);
+      });
+
+
+      app.put("/task/:id", async (req, res) => {
+         const id = req.params.id;
+         const filter = { _id: ObjectId(id) };
+         const task = req.body;
+         // console.log('task:', task)
+         const options = { upsert: true };
+         const updatedDoc = {
+            $set: {
+               title: task.title,
+               description: task.description
+            },
+         };
+         const result = await tasksCollection.updateOne(
+            filter,
+            updatedDoc,
+            options
+         );
+         res.send(result);
+      });
+
+      app.delete("/task/:id", async (req, res) => {
+         const id = req.params.id;
+         const filter = { _id: ObjectId(id) };
+         const result = await tasksCollection.deleteOne(filter);
+         res.send(result);
+      });
+
+
+   
    } finally {
    }
 };
