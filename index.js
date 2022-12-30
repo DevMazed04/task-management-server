@@ -27,6 +27,7 @@ const run = async () => {
       // Database Collections
       const tasksCollection = client.db("taskManagement").collection("tasks");
       const completedTasksCollection = client.db("taskManagement").collection("completedTasks");
+      const usersCollection = client.db("taskManagement").collection("users");
 
       // My Tasks API
       app.get("/tasks", async (req, res) => {
@@ -109,6 +110,20 @@ const run = async () => {
          const id = req.params.id;
          const filter = { _id: ObjectId(id) };
          const result = await completedTasksCollection.deleteOne(filter);
+         res.send(result);
+      });
+
+
+      // Users API
+      app.get("/users", async (req, res) => {
+         const query = {};
+         const users = await usersCollection.find(query).toArray();
+         res.send(users);
+      });
+
+      app.post("/users", async (req, res) => {
+         const user = req.body;
+         const result = await usersCollection.insertOne(user);
          res.send(result);
       });
 
